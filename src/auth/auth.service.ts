@@ -2,12 +2,17 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { usersStorage } from 'src/userStorage';
 import { IAuthUser } from './interface/auth-user';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  async signIn(username: string, password: string): Promise<number> {
+  constructor(private jwtService: JwtService) {}
+
+  async signIn(
+    username: string,
+    password: string,
+  ): Promise<{ access_token: string }> {
     const user: IAuthUser = <IAuthUser>usersStorage.findByName(username);
-    console.log(`user`, user);
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -16,9 +21,9 @@ export class AuthService {
       usersStorage.getPassword(user),
     );
     if (!isMatch) throw new UnauthorizedException();
-    //    const { password, ...result } = user;
-    // TODO: Generate a JWT and return it here
-    // instead of the user object
-    return user.id;
+    const payload = { id: user.id, username };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

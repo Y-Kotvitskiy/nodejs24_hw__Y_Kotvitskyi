@@ -13,11 +13,13 @@ import { IDeleteUser } from './interface/delete-user-interface';
 import { UsersService } from './users.service';
 import { UserPostDto } from './dto/user-post.dto';
 import { UserPatchDto } from './dto/user-patch.dto';
+import { Public } from 'src/app.controller';
 
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
 
+  @Public()
   @Get()
   getUsers(): IGetUser[] {
     return this.userService.getUsers();

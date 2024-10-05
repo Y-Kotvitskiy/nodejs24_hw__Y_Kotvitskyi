@@ -13,7 +13,6 @@ async function hashUserPasswords() {
         saltOrRounds,
       );
   }
-  console.log(users);
 }
 
 async function bootstrap() {

@@ -55,7 +55,6 @@ export class UserStorage {
 
   public findByName(userName: string): IGetUser | undefined {
     for (const userId in this.usersTable) {
-      console.log(this.getFullName(Number(userId)), userId);
       if (this.getFullName(Number(userId)) === userName)
         return this.usersTable[userId];
     }
