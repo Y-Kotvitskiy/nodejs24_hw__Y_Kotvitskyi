@@ -1,11 +1,12 @@
-import { first } from 'rxjs';
 import { IGetUser } from './users/interface/get-user-interface';
 import { IPostUser } from './users/interface/post-user-interface';
 import { IPatchUser } from './users/interface/patch-user-interface';
 import { IDeleteUser } from './users/interface/delete-user-interface';
+import * as bcrypt from 'bcrypt';
 
 interface UsersTable {
   [key: number]: IGetUser;
+  passwd: { [key: number]: string };
 }
 
 export class UserStorage {
@@ -20,6 +21,10 @@ export class UserStorage {
   public getUsers(): IGetUser[] {
     const users: IGetUser[] = [];
     return Object.keys(this.usersTable).map((key) => this.usersTable[key]);
+  }
+
+  public getPassword(user: IGetUser): string | undefined {
+    return this.usersTable.passwd[user.id];
   }
 
   public addUser(user: IPostUser): IGetUser | undefined {
@@ -38,6 +43,23 @@ export class UserStorage {
     getUser.id = this.maxId;
     this.usersTable[this.maxId] = getUser;
     return getUser;
+  }
+
+  private getFullName(userId: number): string | undefined {
+    const user: IGetUser | undefined = this.usersTable[userId];
+    if (user) {
+      return `${user.firstName}_${user.lastName}`;
+    }
+    return undefined;
+  }
+
+  public findByName(userName: string): IGetUser | undefined {
+    for (const userId in this.usersTable) {
+      console.log(this.getFullName(Number(userId)), userId);
+      if (this.getFullName(Number(userId)) === userName)
+        return this.usersTable[userId];
+    }
+    return undefined;
   }
 
   public getUserById(id: number): IGetUser | undefined {
@@ -104,8 +126,14 @@ const users: UsersTable = {
     age: 27,
     isStudent: true,
   },
+  passwd: {
+    1: '123456',
+    2: '123456',
+    3: '123456',
+  },
 };
 
 const usersStorage = new UserStorage(users);
 
 export default usersStorage;
+export { users, usersStorage };

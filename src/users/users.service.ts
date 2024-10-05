@@ -51,4 +51,8 @@ export class UsersService {
     }
     return deletedUser;
   }
+
+  findByName(userName: string): IGetUser | undefined {
+    return usersStorage.findByName(userName);
+  }
 }
