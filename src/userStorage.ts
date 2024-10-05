@@ -2,11 +2,16 @@ import { IGetUser } from './users/interface/get-user-interface';
 import { IPostUser } from './users/interface/post-user-interface';
 import { IPatchUser } from './users/interface/patch-user-interface';
 import { IDeleteUser } from './users/interface/delete-user-interface';
+import { ISingUpUser } from './auth/interface/singup-user';
 import * as bcrypt from 'bcrypt';
+import { saltOrRounds } from './constans';
+
+type Exp = number;
 
 interface UsersTable {
   [key: number]: IGetUser;
   passwd: { [key: number]: string };
+  logout: { [key: number]: Exp };
 }
 
 export class UserStorage {
@@ -14,7 +19,7 @@ export class UserStorage {
 
   constructor(private usersTable: UsersTable) {
     for (const key in usersTable) {
-      this.maxId = Math.max(this.maxId, usersTable[key].id);
+      if (Number(key)) this.maxId = Math.max(this.maxId, usersTable[key].id);
     }
   }
 
@@ -45,7 +50,23 @@ export class UserStorage {
     return getUser;
   }
 
-  private getFullName(userId: number): string | undefined {
+  public createUser(singUpUser: ISingUpUser): number | undefined {
+    const newUser: IGetUser = this.addUser({
+      ...singUpUser,
+      age: 0,
+      isStudent: false,
+    });
+    if (newUser) {
+      this.usersTable.passwd[newUser.id] = singUpUser.password;
+    }
+    return newUser ? newUser.id : undefined;
+  }
+
+  public setPasword(userId: number, userPassword: string) {
+    this.usersTable.passwd[userId] = userPassword;
+  }
+
+  public getFullName(userId: number): string | undefined {
     const user: IGetUser | undefined = this.usersTable[userId];
     if (user) {
       return `${user.firstName}_${user.lastName}`;
@@ -101,6 +122,29 @@ export class UserStorage {
       lastName: user.lastName.trim(),
     };
   }
+
+  public setLogout(id: number): number | undefined {
+    if (this.usersTable[id]) {
+      this.usersTable.logout[id] = Math.floor(Date.now() / 1000);
+      return id;
+    }
+    return undefined;
+  }
+
+  public isExpired(id: number, exp: Exp): boolean {
+    if (this.usersTable[id]) {
+      return this.usersTable.logout[id] > exp;
+    }
+    return false;
+  }
+
+  public clearLogout(id: number): number | undefined {
+    if (this.usersTable[id]) {
+      delete this.usersTable.logout[id];
+      return id;
+    }
+    return undefined;
+  }
 }
 
 const users: UsersTable = {
@@ -130,9 +174,23 @@ const users: UsersTable = {
     2: '123456',
     3: '123456',
   },
+  logout: {},
 };
+
+const hashUserPasswords = async () => {
+  for (const userId in users) {
+    const id: number = Number(userId);
+    if (id) await setUserHash(id);
+  }
+};
+
+const setUserHash = async (userId: number) =>
+  (users.passwd[userId] = await bcrypt.hash(
+    users.passwd[userId],
+    saltOrRounds,
+  ));
 
 const usersStorage = new UserStorage(users);
 
 export default usersStorage;
-export { users, usersStorage };
+export { users, usersStorage, hashUserPasswords, setUserHash };

@@ -1,19 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { users } from './userStorage';
-import * as bcrypt from 'bcrypt';
-import { saltOrRounds } from './constans';
-
-async function hashUserPasswords() {
-  for (const userId in users) {
-    if (userId !== 'passwd')
-      users.passwd[userId] = await bcrypt.hash(
-        users.passwd[userId],
-        saltOrRounds,
-      );
-  }
-}
+import { hashUserPasswords } from './userStorage';
 
 async function bootstrap() {
   await hashUserPasswords();

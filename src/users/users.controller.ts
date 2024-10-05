@@ -19,7 +19,6 @@ import { Public } from 'src/app.controller';
 export class UsersController {
   constructor(private userService: UsersService) {}
 
-  @Public()
   @Get()
   getUsers(): IGetUser[] {
     return this.userService.getUsers();

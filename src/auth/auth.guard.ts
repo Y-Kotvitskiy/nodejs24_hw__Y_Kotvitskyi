@@ -40,7 +40,11 @@ export class AuthGuard implements CanActivate {
       });
 
       const authUser = usersStorage.findByName(payload.username);
-      if (!authUser || authUser.id != payload.id)
+      if (
+        !authUser ||
+        authUser.id != payload.id ||
+        usersStorage.isExpired(authUser.id, payload.iat)
+      )
         throw new UnauthorizedException();
       request['user'] = authUser;
     } catch {
