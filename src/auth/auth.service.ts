@@ -23,25 +23,30 @@ export class AuthService {
         `User with firstName: ${singUpUser.firstName} already exists`,
       );
     }
-    const payload = { id: createdUser.id, username: createdUser.username };
+    const payload = { sub: createdUser.id, username: createdUser.username };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async validateUser(username: string, password: string): Promise<ICreateUser> {
+    const user: ICreateUser = this.usersService.findByName(username);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    user.username = username;
+    if (!(await this.usersService.comparePassword(user.id, password)))
+      throw new UnauthorizedException();
+
+    return user;
   }
 
   async signIn(
     username: string,
     password: string,
   ): Promise<{ access_token: string }> {
-    const user: ICreateUser = this.usersService.findByName(username);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    user.username = username;
-    if (!this.usersService.comparePassword(user.id, password))
-      throw new UnauthorizedException();
-
-    const payload = { id: user.id, username: user.username };
+    const user = await this.validateUser(username, password);
+    const payload = { sub: user.id, username: user.username };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -54,7 +59,7 @@ export class AuthService {
   }
 
   async refreshTokens(user: IAuthUser) {
-    const payload = { id: user.id, username: user.username };
+    const payload = { sub: user.id, username: user.username };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

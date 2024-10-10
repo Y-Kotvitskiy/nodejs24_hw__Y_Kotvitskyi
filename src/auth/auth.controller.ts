@@ -1,19 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { Public } from 'src/app.controller';
 import { IAuthUser } from './interface/auth-user-interface.ts';
-import { ISingUpUser } from './interface/singup-user';
 import { UserSingUpDto } from './dto/user-singup.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from './local-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { Public } from 'src/app.controller';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +18,17 @@ export class AuthController {
     return await this.authService.signUp(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('login')
+  async login(@Body() signInDto: Record<string, any>) {
+    return await this.authService.signIn(
+      signInDto.username,
+      signInDto.password,
+    );
+  }
+
   @Public()
+  @UseGuards(JwtAuthGuard)
   @Post('sign-in')
   async signIn(@Body() signInDto: Record<string, any>) {
     return await this.authService.signIn(
@@ -35,7 +38,7 @@ export class AuthController {
   }
 
   @Get('logout')
-  async getUser(@Req() req: Request) {
+  async getUser(@Req() req: any) {
     const userId = await req.user.id;
     return this.authService.logout(Number(userId));
   }
@@ -44,5 +47,12 @@ export class AuthController {
   async refreshTokens(@Req() req: Request) {
     const user = await req.user;
     return this.authService.refreshTokens(<IAuthUser>user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  async getProfile(@Req() req: Request) {
+    console.log('profile');
+    return req.user;
   }
 }
