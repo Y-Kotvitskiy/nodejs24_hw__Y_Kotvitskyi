@@ -30,11 +30,10 @@ export class UsersService {
   }
 
   async createUser(singUpUser: ISingUpUser): Promise<ICreateUser | undefined> {
-    const createdUser: ICreateUser = usersStorage.createUser(singUpUser);
+    const createdUser: ICreateUser = await usersStorage.createUser(singUpUser);
     if (!createdUser) {
       return undefined;
     }
-    await setUserHash(createdUser.id);
     return createdUser;
   }
 

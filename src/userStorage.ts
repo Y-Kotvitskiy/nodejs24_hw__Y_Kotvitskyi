@@ -51,14 +51,19 @@ export class UserStorage {
     return getUser;
   }
 
-  public createUser(singUpUser: ISingUpUser): ICreateUser | undefined {
+  public async createUser(
+    singUpUser: ISingUpUser,
+  ): Promise<ICreateUser | undefined> {
+    const password = singUpUser.password;
+    delete singUpUser.password;
     const newUser: IGetUser = this.addUser({
       ...singUpUser,
       age: 0,
       isStudent: false,
     });
     if (newUser) {
-      this.usersTable.passwd[newUser.id] = singUpUser.password;
+      this.usersTable.passwd[newUser.id] = password;
+      await setUserHash(newUser.id);
     }
     return newUser
       ? { id: newUser.id, username: this.getFullName(newUser.id) }
@@ -194,11 +199,9 @@ const hashUserPasswords = async () => {
   }
 };
 
-const setUserHash = async (userId: number) =>
-  (users.passwd[userId] = await bcrypt.hash(
-    users.passwd[userId],
-    saltOrRounds,
-  ));
+const setUserHash = async (userId: number) => {
+  users.passwd[userId] = await bcrypt.hash(users.passwd[userId], saltOrRounds);
+};
 
 const usersStorage = new UserStorage(users);
 
