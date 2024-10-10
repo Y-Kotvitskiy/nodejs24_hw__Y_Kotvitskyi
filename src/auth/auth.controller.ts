@@ -3,8 +3,6 @@ import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { IAuthUser } from './interface/auth-user-interface.ts';
 import { UserSingUpDto } from './dto/user-singup.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Public } from 'src/app.controller';
 
@@ -18,16 +16,6 @@ export class AuthController {
     return await this.authService.signUp(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('login')
-  async login(@Body() signInDto: Record<string, any>) {
-    return await this.authService.signIn(
-      signInDto.username,
-      signInDto.password,
-    );
-  }
-
-  @Public()
   @UseGuards(JwtAuthGuard)
   @Post('sign-in')
   async signIn(@Body() signInDto: Record<string, any>) {
@@ -51,8 +39,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async getProfile(@Req() req: Request) {
-    console.log('profile');
-    return req.user;
+  async getProfile(@Req() req: any) {
+    return this.authService.getUser(req.user);
   }
 }

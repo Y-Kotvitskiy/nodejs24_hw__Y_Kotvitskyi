@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -63,5 +64,13 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  getUser({ userId, username }): IAuthUser {
+    const user = this.usersService.getUser(userId);
+    if (!user) {
+      throw new HttpException('Not found', 404);
+    }
+    return { ...user, username };
   }
 }
