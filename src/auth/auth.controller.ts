@@ -16,7 +16,7 @@ export class AuthController {
     return await this.authService.signUp(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Public()
   @Post('sign-in')
   async signIn(@Body() signInDto: Record<string, any>) {
     return await this.authService.signIn(
@@ -27,7 +27,7 @@ export class AuthController {
 
   @Get('logout')
   async getUser(@Req() req: any) {
-    const userId = await req.user.id;
+    const userId = await req.user.userId;
     return this.authService.logout(Number(userId));
   }
 
@@ -37,7 +37,6 @@ export class AuthController {
     return this.authService.refreshTokens(<IAuthUser>user);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Req() req: any) {
     return this.authService.getUser(req.user);

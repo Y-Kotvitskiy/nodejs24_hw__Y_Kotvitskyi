@@ -74,4 +74,8 @@ export class UsersService {
   setLogout(userId: number): number {
     return usersStorage.setLogout(userId);
   }
+
+  isExpired(id: number, iat: number) {
+    return usersStorage.isExpired(id, iat);
+  }
 }
