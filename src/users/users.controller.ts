@@ -31,7 +31,7 @@ export class UsersController {
 
   @Post()
   createUser(@Body() dto: UserPostDto): UserPostDto {
-    return this.userService.createUser(dto);
+    return this.userService.addUser(dto);
   }
 
   @Put(':id')

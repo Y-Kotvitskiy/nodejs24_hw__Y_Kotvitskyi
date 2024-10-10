@@ -11,7 +11,7 @@ import {
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { Public } from 'src/app.controller';
-import { IAuthUser } from './interface/auth-user';
+import { IAuthUser } from './interface/auth-user-interface.ts';
 import { ISingUpUser } from './interface/singup-user';
 import { UserSingUpDto } from './dto/user-singup.dto';
 

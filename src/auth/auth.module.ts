@@ -6,12 +6,14 @@ import { UserStorage } from 'src/userStorage';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { SetMetadata } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports: [],
   providers: [
     AuthService,
     UserStorage,
+    UsersService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

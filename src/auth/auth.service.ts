@@ -3,25 +3,27 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { usersStorage, setUserHash } from 'src/userStorage';
-import { IAuthUser } from './interface/auth-user';
-import * as bcrypt from 'bcrypt';
+import { IAuthUser } from './interface/auth-user-interface.ts';
 import { JwtService } from '@nestjs/jwt';
 import { ISingUpUser } from './interface/singup-user';
+import { ICreateUser } from './interface/create-user-interface.js';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private usersService: UsersService,
+  ) {}
 
   async signUp(singUpUser: ISingUpUser): Promise<{ access_token: string }> {
-    const userId = usersStorage.createUser(singUpUser);
-    if (!userId) {
+    const createdUser = await this.usersService.createUser(singUpUser);
+    if (!createdUser) {
       throw new BadRequestException(
         `User with firstName: ${singUpUser.firstName} already exists`,
       );
     }
-    await setUserHash(userId);
-    const payload = { id: userId, username: usersStorage.getFullName(userId) };
+    const payload = { id: createdUser.id, username: createdUser.username };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
@@ -31,18 +33,15 @@ export class AuthService {
     username: string,
     password: string,
   ): Promise<{ access_token: string }> {
-    const user: IAuthUser = <IAuthUser>usersStorage.findByName(username);
+    const user: ICreateUser = this.usersService.findByName(username);
     if (!user) {
       throw new UnauthorizedException();
     }
     user.username = username;
-    const isMatch = await bcrypt.compare(
-      password,
-      usersStorage.getPassword(user),
-    );
-    if (!isMatch) throw new UnauthorizedException();
+    if (!this.usersService.comparePassword(user.id, password))
+      throw new UnauthorizedException();
 
-    const payload = { id: user.id, username };
+    const payload = { id: user.id, username: user.username };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -50,7 +49,7 @@ export class AuthService {
   }
 
   logout(userId: number): number {
-    if (!usersStorage.setLogout(userId)) throw new UnauthorizedException();
+    if (!this.usersService.setLogout(userId)) throw new UnauthorizedException();
     return userId;
   }
 

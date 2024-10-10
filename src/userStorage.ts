@@ -2,9 +2,10 @@ import { IGetUser } from './users/interface/get-user-interface';
 import { IPostUser } from './users/interface/post-user-interface';
 import { IPatchUser } from './users/interface/patch-user-interface';
 import { IDeleteUser } from './users/interface/delete-user-interface';
-import { ISingUpUser } from './auth/interface/singup-user';
 import * as bcrypt from 'bcrypt';
 import { saltOrRounds } from './constans';
+import { ICreateUser } from './users/interface/create-user-interface';
+import { ISingUpUser } from './users/interface/singup-user.-interface';
 
 type Exp = number;
 
@@ -28,8 +29,8 @@ export class UserStorage {
     return Object.keys(this.usersTable).map((key) => this.usersTable[key]);
   }
 
-  public getPassword(user: IGetUser): string | undefined {
-    return this.usersTable.passwd[user.id];
+  public getPassword(userId: number): string | undefined {
+    return this.usersTable.passwd[userId];
   }
 
   public addUser(user: IPostUser): IGetUser | undefined {
@@ -50,7 +51,7 @@ export class UserStorage {
     return getUser;
   }
 
-  public createUser(singUpUser: ISingUpUser): number | undefined {
+  public createUser(singUpUser: ISingUpUser): ICreateUser | undefined {
     const newUser: IGetUser = this.addUser({
       ...singUpUser,
       age: 0,
@@ -59,7 +60,17 @@ export class UserStorage {
     if (newUser) {
       this.usersTable.passwd[newUser.id] = singUpUser.password;
     }
-    return newUser ? newUser.id : undefined;
+    return newUser
+      ? { id: newUser.id, username: this.getFullName(newUser.id) }
+      : undefined;
+  }
+
+  public findByName(userName: string): ICreateUser | undefined {
+    for (const userId in this.usersTable) {
+      if (this.getFullName(Number(userId)) === userName)
+        return { id: Number(userId), username: userName };
+    }
+    return undefined;
   }
 
   public setPasword(userId: number, userPassword: string) {
@@ -70,14 +81,6 @@ export class UserStorage {
     const user: IGetUser | undefined = this.usersTable[userId];
     if (user) {
       return `${user.firstName}_${user.lastName}`;
-    }
-    return undefined;
-  }
-
-  public findByName(userName: string): IGetUser | undefined {
-    for (const userId in this.usersTable) {
-      if (this.getFullName(Number(userId)) === userName)
-        return this.usersTable[userId];
     }
     return undefined;
   }
@@ -144,6 +147,13 @@ export class UserStorage {
       return id;
     }
     return undefined;
+  }
+
+  public async comparePassword(
+    userId: number,
+    password: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(password, this.getPassword(userId));
   }
 }
 
