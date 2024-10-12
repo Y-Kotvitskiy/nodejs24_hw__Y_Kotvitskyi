@@ -1,9 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { IGetUser } from './interface/get-user-interface';
 import { IPostUser } from './interface/post-user-interface';
-import usersStorage from 'src/userStorage';
 import { IPatchUser } from './interface/patch-user-interface';
 import { IDeleteUser } from './interface/delete-user-interface';
+import usersStorage, { setUserHash } from 'src/userStorage';
+import { ICreateUser } from './interface/create-user-interface';
+import { ISingUpUser } from './interface/singup-user.-interface';
 
 @Injectable()
 export class UsersService {
@@ -19,12 +21,20 @@ export class UsersService {
     return user;
   }
 
-  createUser(postUser: IPostUser): IGetUser {
+  addUser(postUser: IPostUser): IGetUser {
     const user: IGetUser | undefined = usersStorage.addUser(postUser);
     if (!user) {
       throw new HttpException('User already exists', 409);
     }
     return user;
+  }
+
+  async createUser(singUpUser: ISingUpUser): Promise<ICreateUser | undefined> {
+    const createdUser: ICreateUser = await usersStorage.createUser(singUpUser);
+    if (!createdUser) {
+      return undefined;
+    }
+    return createdUser;
   }
 
   updateUser(id: number, putUser: IPostUser): IGetUser {
@@ -50,5 +60,21 @@ export class UsersService {
       throw new HttpException('Not found', 404);
     }
     return deletedUser;
+  }
+
+  findByName(userName: string): ICreateUser | undefined {
+    return usersStorage.findByName(userName);
+  }
+
+  async comparePassword(userId: number, password: string): Promise<boolean> {
+    return usersStorage.comparePassword(userId, password);
+  }
+
+  setLogout(userId: number): number {
+    return usersStorage.setLogout(userId);
+  }
+
+  isExpired(id: number, iat: number) {
+    return usersStorage.isExpired(id, iat);
   }
 }
