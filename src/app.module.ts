@@ -11,11 +11,9 @@ import { MonUserModule } from './mon-user/mon-user.module';
     UsersModule,
     AuthModule,
     MonUserModule,
-    MongooseModule.forRoot('mongodb://admin:password@localhost:27017', {
+    MongooseModule.forRoot('mongodb://admin:password@mongodb:27017', {
       dbName: 'nestjs',
     }),
-    //      'mongodb://localhost:27017/'),
-    // mongodb+srv://[username:password@]host[/[defaultauthdb]
   ],
   controllers: [AppController, AppController],
   providers: [AppService],
