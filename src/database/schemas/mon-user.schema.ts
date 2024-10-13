@@ -1,13 +1,6 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IDBUser } from '../interface/dbuser-interface';
+import * as mongoose from 'mongoose';
 
-@Schema()
-export class MonUser implements IDBUser {
-  @Prop({ required: true })
-  name: string;
-
-  @Prop()
-  age: number;
-}
-
-export const UserSchema = SchemaFactory.createForClass(MonUser);
+export const MonUser = new mongoose.Schema({
+  name: String,
+  age: Number,
+});
