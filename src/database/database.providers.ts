@@ -5,7 +5,9 @@ export const databaseProviders = [
   {
     provide: 'DATABASE_CONNECTION',
     useFactory: async (): Promise<typeof mongoose> =>
-      await mongoose.connect('mongodb://admin:password@127.0.0.1:27017/'),
+      await mongoose.connect('mongodb://admin:password@127.0.0.1:27017', {
+        dbName: 'nestjs',
+      }),
   },
 ];
 
