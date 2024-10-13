@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-
-//export type UserDocument = HydratedDocument<MonUser>;
+import { IDBUser } from '../interface/dbuser-interface';
 
 @Schema()
-export class MonUser {
+export class MonUser implements IDBUser {
   @Prop({ required: true })
   name: string;
 
