@@ -29,17 +29,17 @@ services:
     networks:
       - nest_app
 
-  app:
-    container_name: nest-app
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - '3000:3000'
-    networks:
-      - nest_app
-    depends_on:
-      - mongodb
+  # app:
+  #   container_name: nest-app
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - '3000:3000'
+  #   networks:
+  #     - nest_app
+  #   depends_on:
+  #     - mongodb
 
 # Define named volumes
 volumes:

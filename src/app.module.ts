@@ -11,7 +11,7 @@ import { MonUserModule } from './mon-user/mon-user.module';
     UsersModule,
     AuthModule,
     MonUserModule,
-    MongooseModule.forRoot('mongodb://admin:password@mongodb:27017', {
+    MongooseModule.forRoot('mongodb://admin:password@127.0.0.1:27017', {
       dbName: 'nestjs',
     }),
   ],
