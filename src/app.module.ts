@@ -5,15 +5,17 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MonUserModule } from './mon-user/mon-user.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
-    MonUserModule,
-    MongooseModule.forRoot('mongodb://admin:password@mongodb:27017', {
-      dbName: 'nestjs',
-    }),
+    // MonUserModule,
+    // MongooseModule.forRoot('mongodb://admin:password@mongodb:27017', {
+    //   dbName: 'nestjs',
+    // }),
+    UploadModule,
   ],
   controllers: [AppController, AppController],
   providers: [AppService],
