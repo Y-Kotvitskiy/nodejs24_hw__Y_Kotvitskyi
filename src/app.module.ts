@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MonUserModule } from './mon-user/mon-user.module';
 import { DatabaseModule } from './database/database.module';
 import { DbUsersModule } from './db-users/db-users.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DbUsersModule } from './db-users/db-users.module';
     }),
     DatabaseModule,
     DbUsersModule,
+    UploadModule,
   ],
   controllers: [AppController, AppController],
   providers: [AppService],
