@@ -10,10 +10,10 @@ import { MonUserModule } from './mon-user/mon-user.module';
   imports: [
     UsersModule,
     AuthModule,
-    MonUserModule,
-    MongooseModule.forRoot('mongodb://admin:password@mongodb:27017', {
-      dbName: 'nestjs',
-    }),
+    // MonUserModule,
+    // MongooseModule.forRoot('mongodb://admin:password@mongodb:27017', {
+    //   dbName: 'nestjs',
+    // }),
   ],
   controllers: [AppController, AppController],
   providers: [AppService],
