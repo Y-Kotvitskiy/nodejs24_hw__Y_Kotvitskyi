@@ -7,19 +7,21 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MonUserModule } from './mon-user/mon-user.module';
 import { DatabaseModule } from './database/database.module';
 import { DbUsersModule } from './db-users/db-users.module';
-import { UploadModule } from './upload/upload.module';
+import { ConfigModule } from '@nestjs/config';
+import { configuration } from './config/configuration';
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
-    MonUserModule,
-    MongooseModule.forRoot('mongodb://admin:password@127.0.0.1:27017', {
-      dbName: 'nestjs',
+    //    MonUserModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      load: [configuration],
     }),
     DatabaseModule,
     DbUsersModule,
-    UploadModule,
   ],
   controllers: [AppController, AppController],
   providers: [AppService],

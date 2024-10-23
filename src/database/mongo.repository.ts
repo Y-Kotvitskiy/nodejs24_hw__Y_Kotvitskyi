@@ -14,9 +14,9 @@ export class MongoRepository extends AbstractRepository {
     super();
   }
 
-  async connect(): Promise<void> {
-    await mongoose.connect('mongodb://admin:password@127.0.0.1:27017', {
-      dbName: 'nestjs',
+  async connect(mongo_uri, mongo_db): Promise<void> {
+    await mongoose.connect(mongo_uri, {
+      dbName: mongo_db,
     });
   }
 
