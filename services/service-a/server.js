@@ -1,5 +1,5 @@
-import { error } from 'console';
 import express from 'express';
+import sendToQueue from './producer.js';
 
 const app = express();
 
@@ -28,10 +28,16 @@ app.post('/mesage-send', async (req, res) => {
       console.log('result', result);
       return res.send({ response: `Response is: ${result}` });
     } catch (error) {
-      return res.send({ error: 'Something is goin wrong' });
+      return res.send({ error: 'Something is going wrong' });
     }
   }
   res.send({ error: 'Message is required!' });
+});
+
+app.post('/mesage-queue', async (req, res) => {
+  const message = req.body.message;
+  await sendToQueue(message);
+  res.send(`Sent message: ${message}`);
 });
 
 const PORT = 3000;
